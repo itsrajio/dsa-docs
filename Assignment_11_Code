@@ -1,0 +1,80 @@
+
+#include <iostream>
+#include <vector>
+using namespace std;
+
+void heapify(vector<int>& a, int n, int root, bool ascending) {
+    int best = root;
+    int left = 2 * root + 1;
+    int right = 2 * root + 2;
+
+    // Max heap for ascending order; min heap for descending order
+    if (left < n && (ascending ? a[left] > a[best] : a[left] < a[best])) {
+        best = left;
+    }
+
+    if (right < n && (ascending ? a[right] > a[best] : a[right] < a[best])) {
+        best = right;
+    }
+
+    if (best != root) {
+        swap(a[root], a[best]);
+        heapify(a, n, best, ascending);
+    }
+}
+
+void heapSort(vector<int>& a, bool ascending) {
+    int n = static_cast<int>(a.size());
+
+    // Build the heap
+    for (int i = n / 2 - 1; i >= 0; --i) {
+        heapify(a, n, i, ascending);
+    }
+
+    // Move the root to the end, shrinking the heap each time
+    for (int end = n - 1; end > 0; --end) {
+        swap(a[0], a[end]);
+        heapify(a, end, 0, ascending);
+    }
+}
+
+int main() {
+    int n;
+
+    cout << "Enter the number of elements: ";
+    cin >> n;
+
+    if (n < 0) {
+        cout << "Number of elements cannot be negative.\n";
+        return 1;
+    }
+
+    vector<int> numbers(n);
+
+    cout << "Enter " << n << " numbers: ";
+    for (int& number : numbers) {
+        cin >> number;
+    }
+
+    char choice;
+    cout << "Sort ascending or descending? (A/D): ";
+    cin >> choice;
+
+    bool ascending = (choice == 'A' || choice == 'a');
+
+    if (!ascending && choice != 'D' && choice != 'd') {
+        cout << "Please enter A or D.\n";
+        return 1;
+    }
+
+    heapSort(numbers, ascending);
+
+    cout << "Sorted numbers: ";
+    for (int number : numbers) {
+        cout << number << " ";
+    }
+
+    cout << '\n';
+
+    return 0;
+}
