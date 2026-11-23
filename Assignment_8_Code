@@ -1,0 +1,178 @@
+
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <limits>
+using namespace std;
+
+class Graph {
+private:
+    int vertices;
+    vector<vector<int>> adjacencyList;
+
+public:
+    Graph() : vertices(0) {}
+
+    void createGraph() {
+        int edges;
+
+        cout << "\nEnter number of vertices: ";
+        if (!(cin >> vertices) || vertices <= 0) {
+            cout << "Invalid number of vertices.\n";
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            vertices = 0;
+            return;
+        }
+
+        adjacencyList.assign(vertices, vector<int>());
+
+        cout << "Enter number of friendships (edges): ";
+        if (!(cin >> edges) || edges < 0) {
+            cout << "Invalid number of edges.\n";
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            vertices = 0;
+            adjacencyList.clear();
+            return;
+        }
+
+        for (int i = 0; i < edges; i++) {
+            int source, destination;
+
+            cout << "Enter friendship " << i + 1 << " (two user IDs): ";
+
+            if (!(cin >> source >> destination) ||
+                source < 0 || source >= vertices ||
+                destination < 0 || destination >= vertices) {
+
+                cout << "Invalid user ID. Please create the graph again.\n";
+                cin.clear();
+                cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                vertices = 0;
+                adjacencyList.clear();
+                return;
+            }
+
+            adjacencyList[source].push_back(destination);
+            adjacencyList[destination].push_back(source);
+        }
+
+        cout << "\nSocial network graph created successfully.\n";
+    }
+
+    void displayGraph() const {
+        if (vertices == 0) {
+            cout << "\nPlease create the graph first.\n";
+            return;
+        }
+
+        cout << "\nAdjacency List (Friendship Connections):\n";
+
+        for (int i = 0; i < vertices; i++) {
+            cout << "User " << i << " -> ";
+
+            for (int friendID : adjacencyList[i]) {
+                cout << friendID << " ";
+            }
+
+            cout << '\n';
+        }
+    }
+
+    void BFS(int startVertex) const {
+        if (vertices == 0) {
+            cout << "\nPlease create the graph first.\n";
+            return;
+        }
+
+        if (startVertex < 0 || startVertex >= vertices) {
+            cout << "\nInvalid starting user ID. Enter a value from 0 to "
+                 << vertices - 1 << ".\n";
+            return;
+        }
+
+        vector<bool> visited(vertices, false);
+        queue<int> q;
+
+        visited[startVertex] = true;
+        q.push(startVertex);
+
+        cout << "\nBFS traversal starting from User " << startVertex << ": ";
+
+        while (!q.empty()) {
+            int currentUser = q.front();
+            q.pop();
+
+            cout << currentUser << " ";
+
+            for (int friendID : adjacencyList[currentUser]) {
+                if (!visited[friendID]) {
+                    visited[friendID] = true;
+                    q.push(friendID);
+                }
+            }
+        }
+
+        cout << '\n';
+    }
+};
+
+int main() {
+    Graph socialNetwork;
+    int choice;
+
+    do {
+        cout << "\n========================================\n";
+        cout << "          SOCIAL NETWORK MENU\n";
+        cout << "========================================\n";
+        cout << "1. Create Graph\n";
+        cout << "2. Display Adjacency List\n";
+        cout << "3. Perform BFS\n";
+        cout << "4. Exit\n";
+        cout << "========================================\n";
+        cout << "Enter your choice: ";
+
+        if (!(cin >> choice)) {
+            cout << "\nInvalid input. Please enter a number.\n";
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
+            continue;
+        }
+
+        switch (choice) {
+            case 1:
+                socialNetwork.createGraph();
+                break;
+
+            case 2:
+                socialNetwork.displayGraph();
+                break;
+
+            case 3: {
+                int startVertex;
+
+                cout << "Enter starting user ID: ";
+
+                if (cin >> startVertex) {
+                    socialNetwork.BFS(startVertex);
+                } else {
+                    cout << "Invalid starting user ID.\n";
+                    cin.clear();
+                    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+                }
+                break;
+            }
+
+            case 4:
+                cout << "\nProgram terminated.\n";
+                break;
+
+            default:
+                cout << "\nInvalid choice. Please try again.\n";
+        }
+
+    } while (choice != 4);
+
+    return 0;
+}
